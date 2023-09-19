@@ -1,23 +1,28 @@
-#!/usr/bin/python
-""" holds class Amenity"""
+#!/usr/bin/python3
+"""
+Amenity Class from Models Module
+"""
+import os
 from models.base_model import BaseModel, Base
-from sqlalchemy import Column, Integer, Numeric, String, ForeignKey
+import sqlalchemy
+from sqlalchemy import Column, Integer, String, ForeignKey, DateTime
+from sqlalchemy.orm import sessionmaker
+from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
-import models
 
 
 class Amenity(BaseModel, Base):
-    """Representation of Amenity """
-    if models.storage_type == "db":
-        __tablename__ = "amenities"
+    """Amenity class handles all application amenities"""
 
+    if os.getenv('HBNB_TYPE_STORAGE', 'fs') == 'db':
+        __tablename__ = 'amenities'
         name = Column(String(128), nullable=False)
-        place_amenities = relationship("PlaceAmenity",
-                                       backref="amenities",
-                                       cascade="delete")
+        place_amenities = relationship("Place",
+                                       secondary="place_amenity",
+                                       viewonly=False)
     else:
         name = ""
 
     def __init__(self, *args, **kwargs):
-        """initializes Amenity"""
-        super().__init__(*args, **kwargs)
+        """instantiates a new amenity"""
+        super().__init__(self, *args, **kwargs)

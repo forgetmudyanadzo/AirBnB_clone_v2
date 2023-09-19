@@ -1,28 +1,29 @@
 #!/usr/bin/python3
-""" holds class City"""
+"""
+City Class from Models Module
+"""
+
 from models.base_model import BaseModel, Base
-from sqlalchemy import Column, String, ForeignKey
-from sqlalchemy.orm import relationship
-import models
 import sqlalchemy
+from sqlalchemy import Column, Integer, String, ForeignKey, DateTime, Table
+from sqlalchemy.orm import sessionmaker
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import relationship
+import os
 
 
 class City(BaseModel, Base):
-    """Representation of city """
-    if models.storage_type == "db":
-        __tablename__ = "cities"
+    """City class handles all application cities"""
 
-        name = Column(String(128),
-                      nullable=False)
-        state_id = Column(String(60),
-                          ForeignKey("states.id"))
-        places = relationship("Place",
-                              backref="cities",
-                              cascade="delete")
+    if os.getenv('HBNB_TYPE_STORAGE', 'fs') == 'db':
+        __tablename__ = 'cities'
+        name = Column(String(128), nullable=False)
+        state_id = Column(String(60), ForeignKey('states.id'), nullable=False)
+        places = relationship('Place', cascade="all, delete", backref="cities")
     else:
         name = ""
         state_id = ""
 
     def __init__(self, *args, **kwargs):
-        """initializes city"""
-        super().__init__(*args, **kwargs)
+        """instantiates a new city"""
+        super().__init__(self, *args, **kwargs)
